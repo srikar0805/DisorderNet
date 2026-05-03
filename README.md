@@ -16,7 +16,7 @@ This project asks:
 - Falls back to CAID reference data before using the tiny embedded demo dataset.
 - Converts annotated disorder spans into residue-level binary labels.
 - Splits data at the protein level to avoid residue leakage across train, validation, and test sets.
-- Encodes residues using amino acid identity plus physicochemical features by default.
+- Encodes residues using IDR-aware handcrafted features by default: amino acid identity, physicochemical values, disorder propensity, residue group flags, positional signals, and sliding-window composition.
 - Optionally uses ESM-2 protein language model embeddings for a stronger experiment.
 - Trains `HybridDisorderNet`, a CNN + Transformer + BiLSTM residue classifier in PyTorch.
 - Reports APS, ROC-AUC, F1, MCC, balanced accuracy, specificity, and Fmax.
@@ -69,6 +69,7 @@ For the final project submission, rerun with live DisProt data and report:
 - Whether ESM-2 embeddings were enabled.
 - Test APS and ROC-AUC.
 - Test F1, MCC, balanced accuracy, and Fmax.
+- Final decision threshold selected from validation Fmax.
 - One or two visual examples of residue-level predictions.
 
 ## Model Architecture
@@ -83,6 +84,18 @@ The main model is `HybridDisorderNet`. It is designed to combine complementary s
 
 This is stronger than a plain BiLSTM because IDRs are influenced by local amino acid composition, surrounding sequence context, and longer-range protein patterns.
 
+## Feature Engineering
+
+The default non-ESM path uses biologically motivated IDR features instead of only one-hot amino acid encoding:
+
+- Disorder-promoting residue propensity.
+- Hydropathy, mass, charge, polarity, aromaticity, and sulfur indicators.
+- Residue group flags for charged, polar, hydrophobic, proline, glycine, and low-complexity residues.
+- Relative position and terminal-distance features.
+- Sliding-window statistics at 9, 21, and 41 residues for charge, hydropathy, polarity, low complexity, and disorder propensity.
+
+These features give the model stronger signal when `RUN_ESM2_SECTION = False`.
+
 ## Training Safeguards
 
 The notebook uses a minimum number of epochs before early stopping and checkpoints on a combined validation score:
@@ -92,6 +105,10 @@ The notebook uses a minimum number of epochs before early stopping and checkpoin
 ```
 
 This avoids stopping immediately when APS reaches `1.0000` on a small or easy validation split. If validation metrics are near-perfect from epoch 1, report that as a limitation and rely on the held-out test metrics for the final claim.
+
+Training also uses focal BCE loss with class weighting and a validation-loss learning-rate scheduler to improve recall on imbalanced residue labels.
+
+Final test-set F1, MCC, precision, recall, and confusion matrix values use the validation-selected Fmax threshold instead of a fixed `0.5` threshold, which is more appropriate for imbalanced residue-level labels.
 
 ## Baseline vs. ESM-2 Upgrade
 
