@@ -110,7 +110,3 @@ Then rerun the notebook from the ESM-2 initialization cell onward. This download
 3. Cache downloaded DisProt data and extracted ESM-2 embeddings so reruns are faster.
 4. Add a short error analysis section showing proteins where the model performs well and poorly.
 5. Export a clean prediction CSV with `protein_id`, `position`, `residue`, `true_label`, and `predicted_probability`.
-
-## Suggested Submission Framing
-
-DisorderNet is best presented as a complete, honest ML pipeline rather than only a high-score model. The strongest parts are the residue-level label construction, protein-level split, broad evaluation metrics, and custom sequence inference. The main limitation is that rigorous benchmarking should use sequence-identity-aware splits.
