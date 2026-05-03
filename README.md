@@ -13,7 +13,7 @@ This project asks:
 ## What The Notebook Does
 
 - Downloads curated disorder annotations from DisProt when the API is reachable.
-- Falls back to a small embedded dataset only so the notebook remains runnable offline.
+- Falls back to CAID reference data before using the tiny embedded demo dataset.
 - Converts annotated disorder spans into residue-level binary labels.
 - Splits data at the protein level to avoid residue leakage across train, validation, and test sets.
 - Encodes residues using amino acid identity plus physicochemical features by default.
@@ -44,6 +44,7 @@ The easiest path is Google Colab:
 2. Runtime -> Change runtime type -> GPU is recommended, especially if enabling ESM-2.
 3. Run all cells from top to bottom.
 4. Confirm the printed values:
+   - `Data mode: disprot_api` or `Data mode: caid_reference`
    - `Live data mode: True`
    - `Usable proteins after cleaning: ...`
    - `ESM-2 embeddings enabled: False` or `True`
@@ -60,11 +61,11 @@ jupyter notebook IDR_Project_28.ipynb
 
 ## Important Reporting Note
 
-If DisProt is unavailable, the notebook prints `Live data mode: False` and uses only 10 embedded demo proteins. That mode proves the pipeline works, but it is not a valid benchmark result.
+If DisProt is unavailable, the notebook now tries CAID reference disorder labels before falling back to the 10-protein embedded demo. If it prints `Data mode: caid_reference`, that is still a real residue-labeled benchmark-style dataset. If it prints `Data mode: embedded_demo`, the run only proves the pipeline works and should not be used as a final benchmark result.
 
 For the final project submission, rerun with live DisProt data and report:
 
-- Number of usable proteins after cleaning.
+- Data mode and number of usable proteins after cleaning.
 - Whether ESM-2 embeddings were enabled.
 - Test APS and ROC-AUC.
 - Test F1, MCC, balanced accuracy, and Fmax.
