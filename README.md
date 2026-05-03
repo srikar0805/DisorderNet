@@ -45,6 +45,7 @@ The easiest path is Google Colab:
 2. Runtime -> Change runtime type -> GPU is recommended, especially if enabling ESM-2.
 3. Run all cells from top to bottom.
 4. Confirm the printed values:
+   - `Dataset loader version: bundled_caid_v2`
    - `Data mode: disprot_api` or `Data mode: caid_reference`
    - `Live data mode: True`
    - `Usable proteins after cleaning: ...`
