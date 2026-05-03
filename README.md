@@ -13,7 +13,7 @@ This project asks:
 ## What The Notebook Does
 
 - Downloads curated disorder annotations from DisProt when the API is reachable.
-- Falls back to CAID reference data before using the tiny embedded demo dataset.
+- Falls back to bundled CAID reference data before using the tiny embedded demo dataset.
 - Converts annotated disorder spans into residue-level binary labels.
 - Splits data at the protein level to avoid residue leakage across train, validation, and test sets.
 - Encodes residues using IDR-aware handcrafted features by default: amino acid identity, physicochemical values, disorder propensity, residue group flags, positional signals, and sliding-window composition.
@@ -25,6 +25,7 @@ This project asks:
 ## Repository Contents
 
 - `IDR_Project_28.ipynb`: Main end-to-end notebook.
+- `data/caid2_disorder_nox.fasta` and `data/caid3_disorder_nox.fasta`: Bundled CAID disorder reference files used when DisProt is unavailable.
 - `requirements.txt`: Python packages used by the notebook.
 - `LICENSE`: Repository license.
 
@@ -61,7 +62,7 @@ jupyter notebook IDR_Project_28.ipynb
 
 ## Important Reporting Note
 
-If DisProt is unavailable, the notebook now tries CAID reference disorder labels before falling back to the 10-protein embedded demo. If it prints `Data mode: caid_reference`, that is still a real residue-labeled benchmark-style dataset. If it prints `Data mode: embedded_demo`, the run only proves the pipeline works and should not be used as a final benchmark result.
+If DisProt is unavailable, the notebook now tries bundled CAID reference disorder labels before falling back to the 10-protein embedded demo. If it prints `Data mode: caid_reference`, that is still a real residue-labeled benchmark-style dataset. If it prints `Data mode: embedded_demo`, the run only proves the pipeline works and should not be used as a final benchmark result.
 
 For the final project submission, rerun with live DisProt data and report:
 
