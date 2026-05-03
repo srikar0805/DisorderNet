@@ -83,6 +83,16 @@ The main model is `HybridDisorderNet`. It is designed to combine complementary s
 
 This is stronger than a plain BiLSTM because IDRs are influenced by local amino acid composition, surrounding sequence context, and longer-range protein patterns.
 
+## Training Safeguards
+
+The notebook uses a minimum number of epochs before early stopping and checkpoints on a combined validation score:
+
+```text
+0.40 * APS + 0.30 * Fmax + 0.20 * MCC + 0.10 * ROC-AUC
+```
+
+This avoids stopping immediately when APS reaches `1.0000` on a small or easy validation split. If validation metrics are near-perfect from epoch 1, report that as a limitation and rely on the held-out test metrics for the final claim.
+
 ## Baseline vs. ESM-2 Upgrade
 
 The default feature setup is a fast, reproducible run using sequence-derived residue features. To run the stronger ESM-2 feature version, set this in the configuration cell:
