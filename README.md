@@ -18,7 +18,7 @@ This project asks:
 - Splits data at the protein level to avoid residue leakage across train, validation, and test sets.
 - Encodes residues using amino acid identity plus physicochemical features by default.
 - Optionally uses ESM-2 protein language model embeddings for a stronger experiment.
-- Trains a convolutional + BiLSTM residue classifier in PyTorch.
+- Trains `HybridDisorderNet`, a CNN + Transformer + BiLSTM residue classifier in PyTorch.
 - Reports APS, ROC-AUC, F1, MCC, balanced accuracy, specificity, and Fmax.
 - Exports plots, per-protein metrics, a confusion matrix, and a custom sequence prediction trace.
 
@@ -70,9 +70,21 @@ For the final project submission, rerun with live DisProt data and report:
 - Test F1, MCC, balanced accuracy, and Fmax.
 - One or two visual examples of residue-level predictions.
 
-## Baseline vs. Upgrade
+## Model Architecture
 
-The default configuration is a fast, reproducible baseline using sequence-derived residue features. To run the stronger ESM-2 feature version, set this in the configuration cell:
+The main model is `HybridDisorderNet`. It is designed to combine complementary signals that matter for intrinsic disorder:
+
+- Multi-scale residual CNN branches capture local residue motifs and composition patterns.
+- Transformer self-attention captures longer-range dependencies between residues.
+- A bidirectional LSTM smooths sequence context from both directions.
+- A learned fusion gate combines local, attention-based, and recurrent features for each residue.
+- A residue-level classifier outputs one disorder probability per amino acid.
+
+This is stronger than a plain BiLSTM because IDRs are influenced by local amino acid composition, surrounding sequence context, and longer-range protein patterns.
+
+## Baseline vs. ESM-2 Upgrade
+
+The default feature setup is a fast, reproducible run using sequence-derived residue features. To run the stronger ESM-2 feature version, set this in the configuration cell:
 
 ```python
 RUN_ESM2_SECTION = True
@@ -83,7 +95,7 @@ Then rerun the notebook from the ESM-2 initialization cell onward. This download
 ## Best Next Improvements
 
 1. Add sequence-identity-aware splits with MMseqs2 or CD-HIT so homologous proteins do not appear across train/test splits.
-2. Compare the fast baseline against the ESM-2 variant in a small results table.
+2. Compare three variants in a small results table: old Conv+BiLSTM baseline, HybridDisorderNet with hand-built features, and HybridDisorderNet with ESM-2.
 3. Cache downloaded DisProt data and extracted ESM-2 embeddings so reruns are faster.
 4. Add a short error analysis section showing proteins where the model performs well and poorly.
 5. Export a clean prediction CSV with `protein_id`, `position`, `residue`, `true_label`, and `predicted_probability`.
